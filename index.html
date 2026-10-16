@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Træningsprogrammer</title>
+<meta name="description" content="Martins egne træningsprogrammer, samlet ét sted.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  :root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  html,body{margin:0}
+  img{max-width:100%}
+</style>
+<style>
+  /* Layout: centered column, hero, then a stack of program cards that extends as more are added */
+  :root{
+    --bg:#f5f4f0; --surface:#ffffff;
+    --fg:#1a1c22; --muted:#5c6270; --faint:#8b909c;
+    --line:#e5e2db; --line-strong:#d6d2c8;
+    --accent:#e04e2a; --accent-soft:#fbe7e0;
+    --shadow:0 1px 2px rgba(20,22,30,.05), 0 6px 20px rgba(20,22,30,.05);
+    --display:"Oswald",system-ui,sans-serif;
+    --body:"Figtree",system-ui,-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#121419; --surface:#1b1e26;
+    --fg:#ecebe6; --muted:#a2a7b3; --faint:#767c89;
+    --line:#2a2e39; --line-strong:#373c49;
+    --accent:#ff6a44; --accent-soft:#36241c;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 26px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#121419; --surface:#1b1e26;
+    --fg:#ecebe6; --muted:#a2a7b3; --faint:#767c89;
+    --line:#2a2e39; --line-strong:#373c49;
+    --accent:#ff6a44; --accent-soft:#36241c;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 26px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.5;
+    -webkit-font-smoothing:antialiased;font-size:15px}
+  .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    max-width:620px;margin:0 auto}
+
+  header.hero{padding-block:48px 26px}
+  .kicker{font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    font-size:12px;color:var(--accent);margin:0 0 8px}
+  h1{font-family:var(--display);font-weight:700;letter-spacing:-.01em;line-height:1.0;
+    font-size:clamp(34px,10vw,56px);margin:0;text-transform:uppercase;text-wrap:balance}
+  .lede{color:var(--muted);margin:14px 0 0;max-width:52ch;font-size:15px}
+
+  main{padding-block:4px 56px}
+  .grid{display:flex;flex-direction:column;gap:14px}
+
+  .card{display:block;text-decoration:none;color:inherit;background:var(--surface);
+    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;
+    padding:20px 20px 18px;box-shadow:var(--shadow);transition:transform .14s,border-color .14s,box-shadow .14s}
+  .card:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(20,22,30,.08),0 14px 34px rgba(20,22,30,.10)}
+  .card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .card-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  .card h2{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.01em;
+    font-size:clamp(21px,5vw,26px);margin:0;line-height:1.05}
+  .arrow{font-family:var(--display);font-weight:600;color:var(--accent);font-size:22px;
+    transition:transform .14s;flex:0 0 auto}
+  .card:hover .arrow{transform:translateX(3px)}
+  .card-desc{color:var(--muted);font-size:14px;margin:9px 0 0;max-width:54ch}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .tags span{font-family:var(--display);font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+    font-size:11px;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 9px}
+
+  .more{color:var(--faint);font-size:13px;margin-top:20px;padding-left:4px;
+    border-left:2px dashed var(--line-strong);padding:8px 0 8px 14px}
+  footer{color:var(--faint);font-size:12px;text-align:center;padding-block:8px 28px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="kicker">Martin · hjemmetræning</p>
+    <h1>Trænings&shy;programmer</h1>
+    <p class="lede">Mine egne programmer, samlet ét sted. Åbn et program på mobilen og kryds øvelserne af undervejs — fremdriften huskes på enheden.</p>
+  </header>
+
+  <main>
+    <div class="grid">
+
+      <a class="card" href="programmer/loberknae.html">
+        <div class="card-top">
+          <h2>Styrke mod løberknæ</h2>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <p class="card-desc">Progressivt styrkeprogram for ben og core mod løberknæ. To pas du veksler mellem, opvarmning, 8-ugers progression, smerteregler og plan for at komme tilbage til løb.</p>
+        <div class="tags">
+          <span>Knæ &amp; core</span>
+          <span>2–4 pas/uge</span>
+          <span>Hjemmetræning</span>
+        </div>
+      </a>
+
+    </div>
+
+    <p class="more">Flere programmer lægges her, efterhånden som de kommer til.</p>
+  </main>
+</div>
+
+<footer>Opdateret oktober 2026</footer>
+
+</body>
+</html>

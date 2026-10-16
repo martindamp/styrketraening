@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Løberknæ-program</title>
+<meta name="description" content="Progressivt hjemmeprogram mod løberknæ: hofte-, knæ- og core-styrke med progression og smerteregler.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  :root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  html,body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<style>
+  /* Layout: compact hero → sticky tab bar → one panel at a time; exercise cards are tappable rows for use mid-træning */
+  :root{
+    --bg:#f5f4f0; --surface:#ffffff; --surface-2:#faf9f6;
+    --fg:#1a1c22; --muted:#5c6270; --faint:#8b909c;
+    --line:#e5e2db; --line-strong:#d6d2c8;
+    --accent:#e04e2a; --accent-ink:#ffffff; --accent-soft:#fbe7e0;
+    --green:#2f8f5b; --green-soft:#e2f1e8;
+    --amber:#c98200; --amber-soft:#f7ecd4;
+    --red:#c0392b; --red-soft:#f6e0dd;
+    --shadow:0 1px 2px rgba(20,22,30,.05), 0 6px 20px rgba(20,22,30,.05);
+    --display:"Oswald",system-ui,sans-serif;
+    --body:"Figtree",system-ui,-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#121419; --surface:#1b1e26; --surface-2:#20242d;
+    --fg:#ecebe6; --muted:#a2a7b3; --faint:#767c89;
+    --line:#2a2e39; --line-strong:#373c49;
+    --accent:#ff6a44; --accent-ink:#1a1206; --accent-soft:#36241c;
+    --green:#4cc585; --green-soft:#17271f;
+    --amber:#e6a53a; --amber-soft:#2d2514;
+    --red:#ef6a5c; --red-soft:#2e1a18;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 26px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#121419; --surface:#1b1e26; --surface-2:#20242d;
+    --fg:#ecebe6; --muted:#a2a7b3; --faint:#767c89;
+    --line:#2a2e39; --line-strong:#373c49;
+    --accent:#ff6a44; --accent-ink:#1a1206; --accent-soft:#36241c;
+    --green:#4cc585; --green-soft:#17271f;
+    --amber:#e6a53a; --amber-soft:#2d2514;
+    --red:#ef6a5c; --red-soft:#2e1a18;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 26px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.5;
+    -webkit-font-smoothing:antialiased;font-size:15px}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);
+    background:var(--bg);z-index:30}
+  .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));
+    max-width:680px;margin:0 auto}
+
+  /* hero */
+  header.hero{padding-block:22px 18px}
+  .back{margin:0 0 14px}
+  .back a{color:var(--muted);text-decoration:none;font-weight:600;font-size:13px}
+  .back a:hover{color:var(--accent)}
+  .kicker{font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    font-size:12px;color:var(--accent);margin:0 0 6px}
+  h1{font-family:var(--display);font-weight:700;letter-spacing:-.01em;line-height:1.02;
+    font-size:clamp(30px,8vw,46px);margin:0;text-wrap:balance;text-transform:uppercase}
+  .lede{color:var(--muted);margin:12px 0 0;max-width:60ch;font-size:15px}
+
+  /* tabs */
+  .tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);
+    border-bottom:1px solid var(--line);margin-top:6px}
+  .tabs-inner{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;
+    padding-left:max(16px,env(safe-area-inset-left,0px));
+    padding-right:max(16px,env(safe-area-inset-right,0px));max-width:680px;margin:0 auto}
+  .tabs-inner::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;appearance:none;background:none;border:0;cursor:pointer;
+    font-family:var(--display);font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    font-size:14px;color:var(--muted);padding:13px 12px 11px;border-bottom:2.5px solid transparent;
+    white-space:nowrap}
+  .tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+  .tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:4px}
+
+  main{padding-block:20px 48px}
+  .panel[hidden]{display:none}
+  .panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    flex-wrap:wrap;margin:0 0 4px}
+  .panel-head h2{font-family:var(--display);font-weight:600;text-transform:uppercase;
+    letter-spacing:.02em;font-size:22px;margin:0}
+  .panel-sub{color:var(--muted);font-size:14px;margin:2px 0 18px}
+  .count{font-family:var(--display);font-weight:600;font-size:13px;color:var(--faint);
+    font-variant-numeric:tabular-nums}
+
+  /* exercise card */
+  .list{display:flex;flex-direction:column;gap:10px}
+  .ex{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:14px 15px;box-shadow:var(--shadow);cursor:pointer;transition:opacity .15s,border-color .15s}
+  .ex:has(input:checked){opacity:.5}
+  .ex:has(input:focus-visible){border-color:var(--accent)}
+  .box{width:22px;height:22px;margin-top:1px;border:2px solid var(--line-strong);border-radius:6px;
+    display:grid;place-items:center;transition:background .15s,border-color .15s;flex:0 0 auto}
+  .ex:has(input:checked) .box{background:var(--accent);border-color:var(--accent)}
+  .box svg{width:13px;height:13px;stroke:var(--accent-ink);stroke-width:3.4;fill:none;
+    opacity:0;transition:opacity .15s}
+  .ex:has(input:checked) .box svg{opacity:1}
+  .ex input{position:absolute;opacity:0;width:0;height:0}
+  .ex-main{min-width:0}
+  .ex-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .ex-name{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.01em}
+  .ex:has(input:checked) .ex-name{text-decoration:line-through;text-decoration-color:var(--faint)}
+  .chip{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent);
+    white-space:nowrap}
+  .dose{font-family:var(--display);font-weight:600;font-size:15px;color:var(--fg);
+    font-variant-numeric:tabular-nums;margin-top:3px}
+  .dose b{color:var(--accent);font-weight:700}
+  .cue{color:var(--muted);font-size:13.5px;margin-top:5px}
+  .gear{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+  .gear span{font-size:11px;color:var(--faint);border:1px solid var(--line);border-radius:6px;
+    padding:2px 7px}
+
+  .reset{appearance:none;background:none;border:1px solid var(--line-strong);border-radius:8px;
+    color:var(--muted);font-family:var(--body);font-size:12.5px;font-weight:600;padding:5px 11px;
+    cursor:pointer}
+  .reset:hover{color:var(--fg);border-color:var(--fg)}
+
+  /* generic prose + boxes for plan/guide */
+  .note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 17px;
+    box-shadow:var(--shadow);margin-bottom:12px}
+  .note h3{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.03em;
+    font-size:15px;margin:0 0 8px}
+  .note p{margin:0 0 9px;color:var(--fg);font-size:14px}
+  .note p:last-child{margin-bottom:0}
+  .note .m{color:var(--muted)}
+
+  .phase{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline;
+    padding:12px 0;border-top:1px solid var(--line)}
+  .phase:first-of-type{border-top:0;padding-top:4px}
+  .phase .wk{font-family:var(--display);font-weight:600;color:var(--accent);font-size:14px;
+    letter-spacing:.03em;white-space:nowrap}
+  .phase .ttl{font-family:var(--display);font-weight:600;font-size:16px}
+  .phase .dsc{grid-column:2;color:var(--muted);font-size:13.5px}
+
+  .tl{display:flex;flex-direction:column;gap:8px}
+  .tl-row{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;
+    border-radius:10px;padding:11px 13px;border:1px solid}
+  .tl-g{background:var(--green-soft);border-color:color-mix(in srgb,var(--green) 35%,transparent)}
+  .tl-a{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 35%,transparent)}
+  .tl-r{background:var(--red-soft);border-color:color-mix(in srgb,var(--red) 35%,transparent)}
+  .dot{width:13px;height:13px;border-radius:50%;margin-top:4px}
+  .dot-g{background:var(--green)} .dot-a{background:var(--amber)} .dot-r{background:var(--red)}
+  .tl-row b{font-family:var(--display);font-weight:600;letter-spacing:.02em}
+  .tl-row .lvl{font-variant-numeric:tabular-nums}
+  .tl-row p{margin:3px 0 0;font-size:13.5px;color:var(--fg)}
+
+  .foot{color:var(--faint);font-size:12px;margin-top:22px;text-align:center}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="back"><a href="../">← Alle programmer</a></p>
+    <p class="kicker">Hjemmetræning · knæ &amp; core</p>
+    <h1>Styrke mod løberknæ</h1>
+    <p class="lede">Et progressivt program bygget op om det, forskningen peger på som den mest effektive behandling af løberknæ: kombineret hofte- og knæstyrke, med vægt på ballemusklerne. To pas du veksler mellem, 2–3 gange om ugen. Byg efter dine redskaber derhjemme.</p>
+  </header>
+</div>
+
+<nav class="tabs" aria-label="Sektioner">
+  <div class="tabs-inner" role="tablist">
+    <button class="tab" role="tab" aria-selected="true"  aria-controls="p-a"    id="t-a">Pas A</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-b"    id="t-b">Pas B</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-warm" id="t-warm">Opvarmning</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-plan" id="t-plan">Plan &amp; regler</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- PAS A -->
+  <section class="panel" id="p-a" role="tabpanel" aria-labelledby="t-a">
+    <div class="panel-head">
+      <h2>Pas A · forlår &amp; knæ</h2>
+      <button class="reset" data-reset="A">Nulstil</button>
+    </div>
+    <p class="panel-sub">Quadriceps, isometrik og core. Den spanske squat er omdrejningspunktet — den belaster forlåret tungt uden at mase knæskallen, og dæmper typisk smerten. <span class="count" data-count="A"></span></p>
+    <div class="list" data-session="A"></div>
+  </section>
+
+  <!-- PAS B -->
+  <section class="panel" id="p-b" role="tabpanel" aria-labelledby="t-b" hidden>
+    <div class="panel-head">
+      <h2>Pas B · hofte &amp; bagkæde</h2>
+      <button class="reset" data-reset="B">Nulstil</button>
+    </div>
+    <p class="panel-sub">Baller (især gluteus medius), baglår og core. Det er den her del studierne finder stærkest effekt af hos løbere med knæsmerter. <span class="count" data-count="B"></span></p>
+    <div class="list" data-session="B"></div>
+  </section>
+
+  <!-- OPVARMNING -->
+  <section class="panel" id="p-warm" role="tabpanel" aria-labelledby="t-warm" hidden>
+    <div class="panel-head">
+      <h2>Opvarmning &amp; aktivering</h2>
+      <button class="reset" data-reset="W">Nulstil</button>
+    </div>
+    <p class="panel-sub">5–8 minutter før hvert pas. Får ballerne til at tænde og knæet gennem et smertefrit bevægeudslag, inden du belaster. <span class="count" data-count="W"></span></p>
+    <div class="list" data-session="W"></div>
+  </section>
+
+  <!-- PLAN & REGLER -->
+  <section class="panel" id="p-plan" role="tabpanel" aria-labelledby="t-plan" hidden>
+    <div class="panel-head"><h2>Plan &amp; regler</h2></div>
+
+    <div class="note">
+      <h3>Sådan kører du det</h3>
+      <p>Veksl mellem <b>Pas A</b> og <b>Pas B</b>, <b>2–4 pas om ugen</b> — helst ikke det samme pas to dage i træk. Hvert pas tager ca. 40–45 min inkl. opvarmning. Hold fast i mindst 6–8 uger, før du forventer at mærke en tydelig forskel på knæet.</p>
+    </div>
+
+    <div class="note">
+      <h3>Progression</h3>
+      <div class="phase"><span class="wk">Uge 1–3</span><span class="ttl">Tilvænning</span>
+        <span class="dsc">Let vægt eller ren kropsvægt. Fokus på teknik og på at få ballerne til at arbejde. Prioritér de isometriske hold (spansk squat / vægsidde) — de tåles godt selv med ømt knæ.</span></div>
+      <div class="phase"><span class="wk">Uge 4–6</span><span class="ttl">Belastning</span>
+        <span class="dsc">Øg vægten på håndvægtene, og læg mere vægt på enkeltbensøvelserne. Lad reps falde mod 8–10 på de tunge øvelser, så du reelt bliver stærkere.</span></div>
+      <div class="phase"><span class="wk">Uge 7+</span><span class="ttl">Styrke &amp; tilbage til løb</span>
+        <span class="dsc">Tungere, og langsom nedbremsning (ca. 3 sek. på vej ned). Begynd roligt at bygge løbevolumen op igen i takt med at knæet tillader det.</span></div>
+    </div>
+
+    <div class="note">
+      <h3>Tilbage til løb</h3>
+      <p class="m">Hvornår afgøres af knæet, ikke af kalenderen. Du har grønt lys når du kan nikke ja til stort set alle fire:</p>
+      <p>· Dagligdagen er næsten smertefri (≤2–3/10) — særligt trapper <b>ned</b>, squat og at sidde længe med bøjet knæ.<br>
+         · Dine styrkepas giver ikke længere eftersmerte dagen efter.<br>
+         · Du kan lave enkeltbens step-downs / enkeltbens squat med god kontrol og uden smerte.<br>
+         · Du kan lave 10–20 enkeltbens-hop på det onde ben uden smerte.</p>
+      <p class="m">For de fleste milde tilfælde er det et sted mellem 2 og 6 uger. Når du starter: gå-løb-intervaller på fladt, blødt underlag, hver anden dag (fx 1 min løb / 1–2 min gang × 6–8). Byg løbe-tiden op før du øger distancen, og behold styrketræningen 2–3 gange om ugen ved siden af.</p>
+    </div>
+
+    <div class="note">
+      <h3>Smerte-trafiklys</h3>
+      <p class="m">Styrende regel: knæet må gerne give lidt ubehag under træning — det må bare ikke være værre dagen efter.</p>
+      <div class="tl">
+        <div class="tl-row tl-g"><span class="dot dot-g"></span><div>
+          <b>Grøn — <span class="lvl">0–3/10</span></b><p>Fortsæt. Let ømhed er helt fint og forventet.</p></div></div>
+        <div class="tl-row tl-a"><span class="dot dot-a"></span><div>
+          <b>Gul — <span class="lvl">4–5/10</span></b><p>Acceptabelt under øvelsen, så længe smerten er faldet tilbage til udgangspunktet inden for 24 timer.</p></div></div>
+        <div class="tl-row tl-r"><span class="dot dot-r"></span><div>
+          <b>Rød — <span class="lvl">over 5/10</span></b><p>Eller værre næste morgen, eller hævelse: skru ned på vægt, bevægeudslag eller antal sæt næste gang.</p></div></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <h3>Det eneste du mangler</h3>
+      <p>Et sæt <b>loop-elastikker</b> med forskellige modstande (~100–200 kr). De bruges til clamshells, monster walks, hofteabduktion, Pallof press og til at spænde den spanske squat op. Alt det andet har du allerede: håndvægte, træningsbold, stepbræt, foam rollers og måtte/pude.</p>
+      <p class="m">Vil du gerne lave spansk squat og Pallof ordentligt, er en enkelt lang elastik til at spænde fast om et bordben eller en dørkarm også rar at have — men en kraftig loop-elastik kan klare det meste.</p>
+    </div>
+
+    <div class="note">
+      <h3>Et forbehold</h3>
+      <p class="m">"Løberknæ" dækker over et par forskellige ting — oftest patellofemoralt smertesyndrom (smerte omkring/bag knæskallen) eller irritation af IT-båndet på ydersiden. Programmet her rammer begge. Men er smerten skarp, låser knæet, hæver det, eller bedres det slet ikke over 4–6 uger, så få en fysioterapeut til at se på det og stille den egentlige diagnose. Det her erstatter ikke en vurdering af dit knæ.</p>
+    </div>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var CHECK='<svg viewBox="0 0 16 16"><path d="M2.5 8.5l3.5 3.5 7.5-8"/></svg>';
+
+  var data={
+    W:[
+      {n:"Foam rolling",c:"Lår (forside), yderlår, baller og lægge. Rul langsomt, 30–45 sek. pr. område. Brug knoprullen på de ømme punkter.",d:"4–5 områder",t:"Mobilitet",g:["Glat rulle","Knoprulle"]},
+      {n:"Knæbøjninger",c:"Rolige, kun så dybt det er smertefrit. Varmer knæet op gennem sit udslag.",d:"1 × 10",t:"Knæ",g:["Kropsvægt"]},
+      {n:"Glute bridge",c:"Ryg på gulvet, fødder i gulvet, løft hoften og klem ballerne i toppen.",d:"2 × 12",t:"Baller",g:["Måtte/pude"]},
+      {n:"Clamshells",c:"Sideliggende, knæ bøjet, åbn det øverste knæ uden at rulle bagover. Elastik om lårene gør det hårdere.",d:"2 × 15 / side",t:"Gluteus med.",g:["Elastik (valgfri)"]},
+      {n:"Benpendul & hoftecirkler",c:"Sving benet frem/tilbage og ud til siden, afslappet. Åbner hoften.",d:"10 / side",t:"Hofte",g:["Kropsvægt"]}
+    ],
+    A:[
+      {n:"Spansk squat",c:"Elastik om knæhaserne spændt fast foran dig; læn dig tilbage og sid i en halv knæbøjning. Isometrisk hold. Uden elastik: vægsidde mod væggen.",d:"5 × 30–45 sek",t:"Quadriceps",g:["Elastik","el. væg"]},
+      {n:"Goblet squat",c:"Håndvægt mod brystet. Kun så dybt som smertefrit, knæene følger tæernes retning.",d:"3 × 10–12",t:"Forlår/baller",g:["Håndvægt"]},
+      {n:"Omvendt udfald",c:"Træd bagud og sænk roligt. Skånsommere for knæskallen end udfald fremad. Håndvægte efter behov.",d:"3 × 8–10 / ben",t:"Ben",g:["Håndvægte"]},
+      {n:"Step-ups",c:"Træd roligt op på stepbrættet med ét ben og pres op uden at sætte af med det bagerste. Sænk kontrolleret ned igen. Progression: step-downs, hvor du står på brættet og sænker modsatte hæl langsomt mod gulvet — stærk øvelse for netop knæskalssmerter.",d:"3 × 8–10 / ben",t:"Forlår/baller",g:["Stepbræt","Håndvægte"]},
+      {n:"Hamstring curl på bold",c:"Ryg på gulvet, hæle på bolden, løft hoften og rul bolden ind mod dig med hælene.",d:"3 × 10–12",t:"Baglår",g:["Træningsbold"]},
+      {n:"Enkeltbens lægpres",c:"Stå på ét ben, gerne med forfoden på kanten af stepbrættet så hælen kan synke under kanten og give fuldt udslag. Hæv langsomt op på tå og sænk kontrolleret. Vigtig for løbere.",d:"3 × 12–15 / ben",t:"Lægge",g:["Stepbræt"]},
+      {n:"Dead bug",c:"Ryg på gulvet, lænden presset mod gulvet; sænk modsat arm og ben skiftevis.",d:"3 × 8 / side",t:"Core",g:["Måtte/pude"]},
+      {n:"Sideplanke",c:"På albue og sidekant af foden, krop i lige linje. Hofte helt oppe.",d:"3 × 20–40 sek / side",t:"Core",g:["Måtte/pude"]}
+    ],
+    B:[
+      {n:"Rumænsk dødløft",c:"Håndvægte langs benene, let bøjede knæ, skub hoften bagud med lige ryg. Mærk det i baglåret.",d:"3 × 10",t:"Bagkæde",g:["Håndvægte"]},
+      {n:"Bulgarsk split squat",c:"Bagerste fodrist på bolden eller en stol; sænk roligt lige ned på det forreste ben.",d:"3 × 8 / ben",t:"Ben/baller",g:["Træningsbold","Håndvægte"]},
+      {n:"Sidelæns elastikgang",c:"Loop-elastik om lårene, gå små skridt til siden i let knæbøjning uden at knæene falder indad.",d:"3 × 10 skridt / vej",t:"Gluteus med.",g:["Elastik"]},
+      {n:"Sideliggende hofteabduktion",c:"Løft det øverste ben lige op og lidt bagud, roligt. Elastik om lårene gør det hårdere.",d:"3 × 15 / side",t:"Gluteus med.",g:["Elastik (valgfri)"]},
+      {n:"Enkeltbens glute bridge",c:"Glute bridge men med ét ben strakt ud. Hold hoften vandret — den må ikke synke til siden.",d:"3 × 10 / ben",t:"Baller",g:["Måtte/pude"]},
+      {n:"Bird dog",c:"På alle fire, stræk modsat arm og ben ud i én linje uden at rotere i ryggen.",d:"3 × 8 / side",t:"Core/hofte",g:["Måtte/pude"]},
+      {n:"Pallof press",c:"Elastik spændt fast til siden; pres hænderne lige frem og modstå rotationen. Alt: 'stir the pot' med albuerne på træningsbolden.",d:"3 × 10 / side",t:"Core",g:["Elastik","el. bold"]}
+    ]
+  };
+
+  var store={};
+  try{ store=JSON.parse(localStorage.getItem('lk_prog')||'{}')||{}; }catch(e){ store={}; }
+  function save(){ try{ localStorage.setItem('lk_prog',JSON.stringify(store)); }catch(e){} }
+
+  Object.keys(data).forEach(function(sess){
+    var host=document.querySelector('.list[data-session="'+sess+'"]');
+    if(!host) return;
+    data[sess].forEach(function(ex,i){
+      var key=sess+'_'+i;
+      var checked = store[key]===true;
+      var label=document.createElement('label');
+      label.className='ex';
+      label.innerHTML=
+        '<input type="checkbox" '+(checked?'checked':'')+'>'+
+        '<span class="box">'+CHECK+'</span>'+
+        '<span class="ex-main">'+
+          '<span class="ex-top"><span class="ex-name"></span><span class="chip"></span></span>'+
+          '<span class="dose"></span>'+
+          '<span class="cue"></span>'+
+          '<span class="gear"></span>'+
+        '</span>';
+      label.querySelector('.ex-name').textContent=ex.n;
+      label.querySelector('.chip').textContent=ex.t;
+      label.querySelector('.dose').textContent=ex.d;
+      label.querySelector('.cue').textContent=ex.c;
+      var gear=label.querySelector('.gear');
+      ex.g.forEach(function(gg){ var s=document.createElement('span'); s.textContent=gg; gear.appendChild(s); });
+      var cb=label.querySelector('input');
+      cb.addEventListener('change',function(){ store[key]=cb.checked; save(); updateCount(sess); });
+      host.appendChild(label);
+    });
+    updateCount(sess);
+  });
+
+  function updateCount(sess){
+    var total=data[sess].length, done=0;
+    for(var i=0;i<total;i++){ if(store[sess+'_'+i]===true) done++; }
+    var el=document.querySelector('[data-count="'+sess+'"]');
+    if(el) el.textContent='· '+done+'/'+total+' klaret';
+  }
+
+  document.querySelectorAll('.reset').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var sess=btn.getAttribute('data-reset');
+      data[sess].forEach(function(_,i){ delete store[sess+'_'+i]; });
+      save();
+      document.querySelectorAll('.list[data-session="'+sess+'"] input').forEach(function(cb){ cb.checked=false; });
+      updateCount(sess);
+    });
+  });
+
+  var tabs=Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  function select(tab){
+    tabs.forEach(function(t){
+      var on=t===tab;
+      t.setAttribute('aria-selected',on?'true':'false');
+      var panel=document.getElementById(t.getAttribute('aria-controls'));
+      if(panel) panel.hidden=!on;
+    });
+    window.scrollTo({top:0,behavior:'auto'});
+  }
+  tabs.forEach(function(t,idx){
+    t.addEventListener('click',function(){ select(t); });
+    t.addEventListener('keydown',function(e){
+      var i=null;
+      if(e.key==='ArrowRight') i=(idx+1)%tabs.length;
+      if(e.key==='ArrowLeft') i=(idx-1+tabs.length)%tabs.length;
+      if(i!==null){ e.preventDefault(); tabs[i].focus(); select(tabs[i]); }
+    });
+  });
+
+  var foot=document.getElementById('foot');
+  if(foot) foot.textContent='Afkryds øvelser undervejs — det huskes på denne enhed. Tilpas vægt og udslag til dit knæ.';
+})();
+</script>
+</body>
+</html>
