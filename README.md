@@ -26,3 +26,19 @@ Eksisterende program: [`loberknae/`](loberknae/) → https://martindamp.github.i
 3. Tilføj et kort på forsiden: kopiér `<a class="card">`-blokken i `index.html` og peg den på den nye mappe (`href="<programnavn>/"`).
 
 Siderne deler designsystem, så et nyt program ser automatisk ud som resten.
+
+## Synk til Garmin
+
+`push_strength_to_garmin.py` opretter programmet som **workouts i Garmin Connect** (ikke i kalenderen — bare som workouts du selv starter på uret). Hvert pas (Opvarmning, Pas A, Pas B) bliver én styrke-workout med navnet `LØBERKNÆ · <pas>`.
+
+Øvelserne læses fra den samme `loberknae/program.json`, som websiden bruger — ét sted at rette. `garmin`-blokken på hver øvelse styrer, hvad der sendes til uret (sæt, reps/tid, øvelsesnavn). Øvelser uden `garmin`-blok (ren mobilitet) springes over.
+
+GitHub Actionen `sync-garmin-strength.yml` kører automatisk, når `program.json` ændres på main, og kan køres manuelt fra Actions-fanen. Den sletter de gamle `LØBERKNÆ`-workouts og opretter dem forfra, så uret altid matcher filen.
+
+**Opsætning (engangs):** tilføj en repository-secret `GARMIN_TOKEN` under Settings → Secrets and variables → Actions. Generér værdien på en maskine, hvor Garmin-login allerede virker:
+
+```bash
+python -c "import garth,os; garth.resume(os.path.expanduser('~/.garminconnect')); print(garth.client.dumps())"
+```
+
+Kør lokalt med `python push_strength_to_garmin.py loberknae/program.json --dry-run` for at se payloaden uden at uploade. `--run-tests` kører de interne tests.

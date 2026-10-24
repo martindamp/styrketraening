@@ -277,36 +277,18 @@
   "use strict";
   var CHECK='<svg viewBox="0 0 16 16"><path d="M2.5 8.5l3.5 3.5 7.5-8"/></svg>';
 
-  var data={
-    W:[
-      {n:"Foam rolling",c:"Lår (forside), yderlår, baller og lægge. Rul langsomt, 30–45 sek. pr. område. Brug knoprullen på de ømme punkter.",d:"4–5 områder",t:"Mobilitet",g:["Glat rulle","Knoprulle"]},
-      {n:"Knæbøjninger",c:"Rolige, kun så dybt det er smertefrit. Varmer knæet op gennem sit udslag.",d:"1 × 10",t:"Knæ",g:["Kropsvægt"]},
-      {n:"Glute bridge",c:"Ryg på gulvet, fødder i gulvet, løft hoften og klem ballerne i toppen.",d:"2 × 12",t:"Baller",g:["Måtte/pude"]},
-      {n:"Clamshells",c:"Sideliggende, knæ bøjet, åbn det øverste knæ uden at rulle bagover. Elastik om lårene gør det hårdere.",d:"2 × 15 / side",t:"Gluteus med.",g:["Elastik (valgfri)"]},
-      {n:"Benpendul & hoftecirkler",c:"Sving benet frem/tilbage og ud til siden, afslappet. Åbner hoften.",d:"10 / side",t:"Hofte",g:["Kropsvægt"]}
-    ],
-    A:[
-      {n:"Spansk squat",c:"Elastik om knæhaserne spændt fast foran dig; læn dig tilbage og sid i en halv knæbøjning. Isometrisk hold. Uden elastik: vægsidde mod væggen.",d:"5 × 30–45 sek",t:"Quadriceps",g:["Elastik","el. væg"]},
-      {n:"Goblet squat",c:"Håndvægt mod brystet. Kun så dybt som smertefrit, knæene følger tæernes retning.",d:"3 × 10–12",t:"Forlår/baller",g:["Håndvægt"]},
-      {n:"Omvendt udfald",c:"Træd bagud og sænk roligt. Skånsommere for knæskallen end udfald fremad. Håndvægte efter behov.",d:"3 × 8–10 / ben",t:"Ben",g:["Håndvægte"]},
-      {n:"Step-ups",c:"Træd roligt op på stepbrættet med ét ben og pres op uden at sætte af med det bagerste. Sænk kontrolleret ned igen. Progression: step-downs, hvor du står på brættet og sænker modsatte hæl langsomt mod gulvet — stærk øvelse for netop knæskalssmerter.",d:"3 × 8–10 / ben",t:"Forlår/baller",g:["Stepbræt","Håndvægte"]},
-      {n:"Hamstring curl på bold",c:"Ryg på gulvet, hæle på bolden, løft hoften og rul bolden ind mod dig med hælene.",d:"3 × 10–12",t:"Baglår",g:["Træningsbold"]},
-      {n:"Enkeltbens lægpres",c:"Stå på ét ben, gerne med forfoden på kanten af stepbrættet så hælen kan synke under kanten og give fuldt udslag. Hæv langsomt op på tå og sænk kontrolleret. Vigtig for løbere.",d:"3 × 12–15 / ben",t:"Lægge",g:["Stepbræt"]},
-      {n:"Dead bug",c:"Ryg på gulvet, lænden presset mod gulvet; sænk modsat arm og ben skiftevis.",d:"3 × 8 / side",t:"Core",g:["Måtte/pude"]},
-      {n:"Sideplanke",c:"På albue og sidekant af foden, krop i lige linje. Hofte helt oppe.",d:"3 × 20–40 sek / side",t:"Core",g:["Måtte/pude"]}
-    ],
-    B:[
-      {n:"Rumænsk dødløft",c:"Håndvægte langs benene, let bøjede knæ, skub hoften bagud med lige ryg. Mærk det i baglåret.",d:"3 × 10",t:"Bagkæde",g:["Håndvægte"]},
-      {n:"Enkeltbens RDL",c:"Stå på ét ben, let bøjet knæ. Tip overkroppen frem og før det bagerste ben bagud, til du mærker det i baglåret — hold hoften vandret, den må ikke åbne til siden. Håndvægt i modsatte hånd. Træner balance og hoftestabilitet oven i baglår/baller.",d:"3 × 8 / ben",t:"Bagkæde",g:["Håndvægt"]},
-      {n:"Bulgarsk split squat",c:"Bagerste fodrist på bolden eller en stol; sænk roligt lige ned på det forreste ben.",d:"3 × 8 / ben",t:"Ben/baller",g:["Træningsbold","Håndvægte"]},
-      {n:"Sidelæns elastikgang",c:"Loop-elastik om lårene, gå små skridt til siden i let knæbøjning uden at knæene falder indad.",d:"3 × 10 skridt / vej",t:"Gluteus med.",g:["Elastik"]},
-      {n:"Sideliggende hofteabduktion",c:"Løft det øverste ben lige op og lidt bagud, roligt. Elastik om lårene gør det hårdere.",d:"3 × 15 / side",t:"Gluteus med.",g:["Elastik (valgfri)"]},
-      {n:"Enkeltbens glute bridge",c:"Glute bridge men med ét ben strakt ud. Hold hoften vandret — den må ikke synke til siden.",d:"3 × 10 / ben",t:"Baller",g:["Måtte/pude"]},
-      {n:"Bird dog",c:"På alle fire, stræk modsat arm og ben ud i én linje uden at rotere i ryggen.",d:"3 × 8 / side",t:"Core/hofte",g:["Måtte/pude"]},
-      {n:"Pallof press",c:"Elastik spændt fast til siden; pres hænderne lige frem og modstå rotationen. Alt: 'stir the pot' med albuerne på træningsbolden.",d:"3 × 10 / side",t:"Core",g:["Elastik","el. bold"]}
-    ]
-  };
+  // Øvelserne hentes fra den fælles datakilde program.json (samme fil
+  // som Garmin-synken bruger), så web og ur altid matcher.
+  fetch('program.json', {cache:'no-cache'})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(json){ init(json.sessions||{}); })
+    .catch(function(){
+      document.querySelectorAll('.list[data-session]').forEach(function(host){
+        host.innerHTML='<p style="color:var(--muted);font-size:14px">Kunne ikke indlæse øvelserne lige nu. Prøv at genindlæse siden.</p>';
+      });
+    });
 
+function init(data){
   var store={};
   try{ store=JSON.parse(localStorage.getItem('lk_prog')||'{}')||{}; }catch(e){ store={}; }
   function save(){ try{ localStorage.setItem('lk_prog',JSON.stringify(store)); }catch(e){} }
@@ -380,6 +362,7 @@
 
   var foot=document.getElementById('foot');
   if(foot) foot.textContent='Afkryds øvelser undervejs — det huskes på denne enhed. Tilpas vægt og udslag til dit knæ.';
+} // init
 })();
 </script>
 </body>

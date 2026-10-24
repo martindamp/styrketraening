@@ -1,0 +1,58 @@
+name: Sync strength program to Garmin
+
+# Creates/updates the strength program as Garmin workouts (NOT in the
+# calendar). Runs automatically when loberknae/program.json changes on
+# main, and on demand from the Actions tab ("Run workflow").
+#
+# Auth: add a repository secret named GARMIN_TOKEN (a base64 garth token).
+# Generate it once on a machine where Garmin login already works:
+#   python -c "import garth,os; garth.resume(os.path.expanduser('~/.garminconnect')); print(garth.client.dumps())"
+# or, from scratch:
+#   python -c "import garth; garth.login('EMAIL','PASSWORD'); print(garth.client.dumps())"
+# Paste the printed string as the secret. (Alternatively set GARMIN_EMAIL
+# and GARMIN_PASSWORD secrets instead — works only if the account has no MFA.)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "loberknae/program.json"
+      - "push_strength_to_garmin.py"
+  workflow_dispatch:
+    inputs:
+      extra_args:
+        description: >
+          Extra flags for push_strength_to_garmin.py, e.g.
+          "--session A --session B", "--dry-run", or "--delete".
+        required: false
+        default: ""
+
+concurrency:
+  group: garmin-strength-sync-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install --upgrade garminconnect garth curl_cffi
+
+      - name: Sync strength program to Garmin
+        env:
+          GARMIN_TOKEN: ${{ secrets.GARMIN_TOKEN }}
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          EXTRA_ARGS: ${{ github.event.inputs.extra_args }}
+        run: |
+          set -euo pipefail
+          read -r -a extra_args_arr <<< "${EXTRA_ARGS:-}"
+          python push_strength_to_garmin.py loberknae/program.json "${extra_args_arr[@]}"
