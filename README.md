@@ -42,3 +42,12 @@ python -c "import garth,os; garth.resume(os.path.expanduser('~/.garminconnect'))
 ```
 
 Kør lokalt med `python push_strength_to_garmin.py loberknae/program.json --dry-run` for at se payloaden uden at uploade. `--run-tests` kører de interne tests.
+
+### Garmin øvelsesnavne
+
+`category`/`exercise` i `program.json` er Garmins egne enum-værdier. De er slået op i:
+
+- Regneark med hele Garmins øvelseskatalog (kategori, navn, muskelgrupper, udstyr): https://docs.google.com/spreadsheets/d/1OaqIaBhPk4xBnkqVPYvFpj2HZNk_ISX0zHgWfA0WXkQ/edit?gid=608592697#gid=608592697
+- Kildeprojektet der genererer det: [maximecharriere/GarminExercisesCollector](https://github.com/maximecharriere/GarminExercisesCollector)
+
+Skal en øvelse have et nyt navn, så find `CATEGORY_GARMIN` + `NAME_GARMIN` i regnearket og skriv dem ind i `program.json`.
