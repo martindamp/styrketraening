@@ -29,7 +29,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import base64
 import json
 import os
 import sys
@@ -219,9 +218,11 @@ def authenticate():
     token = os.getenv("GARMIN_TOKEN")
     if token:
         # Preferred for CI: a base64 garth token stored as a GitHub secret.
+        # This is exactly the string printed by garth.client.dumps(); garth's
+        # loads() base64-decodes it internally, so pass it through verbatim.
         try:
             import garth
-            garth.client.loads(base64.b64decode(token).decode() if _looks_b64(token) else token)
+            garth.client.loads(token.strip())
             os.makedirs(TOKENSTORE, exist_ok=True)
             garth.save(TOKENSTORE)
         except Exception as exc:
@@ -237,14 +238,6 @@ def authenticate():
     client = Garmin(email, password, prompt_mfa=lambda: input("MFA code: "))
     client.login(TOKENSTORE)
     return client
-
-
-def _looks_b64(s: str) -> bool:
-    try:
-        base64.b64decode(s, validate=True)
-        return not s.strip().startswith("{")
-    except Exception:
-        return False
 
 
 # --------------------------------------------------------------------------- #
